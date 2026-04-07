@@ -38,3 +38,31 @@ jobs:
           # 빌드 시간 단축을 위한 Docker 레이어 캐싱 설정
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mlops-sentiment-api:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mlops-sentiment-api:buildcache,mode=max
+
+  deploy-to-local:
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
+    runs-on: self-hosted
+    
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull the latest image
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/mlops-sentiment-api:latest
+
+      - name: Stop and remove old container
+        run: |
+          docker stop mlops-sentiment-api || true
+          docker rm mlops-sentiment-api || true
+
+      - name: Run new container
+        run: |
+          docker run -d \
+            --name mlops-sentiment-api \
+            -p 8000:8000 \
+            --restart unless-stopped \
+            ${{ secrets.DOCKERHUB_USERNAME }}/mlops-sentiment-api:latest
