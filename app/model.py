@@ -8,8 +8,8 @@ class SentimentModel:
         logger.info("Initializing the sentiment analysis model...")
         # Using HuggingFace's default lightweight pipeline for sentiment analysis (DistilBERT base).
         # Note: This is an English model by default. 
-        # For Korean sentiment analysis, you can change the model to: model="monologg/koelectra-small-v2-nsmc"
-        self.model = pipeline("sentiment-analysis", model="monologg/koelectra-small-v2-nsmc")
+        # For Korean sentiment analysis, you can change the model to: model="monologg/koelectra-small-finetuned-nsmc"
+        self.model = pipeline("sentiment-analysis", model="monologg/koelectra-small-finetuned-nsmc")
         logger.info("Model initialized successfully.")
 
     def predict(self, text: str) -> dict:
