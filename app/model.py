@@ -15,8 +15,16 @@ class SentimentModel:
     def predict(self, text: str) -> dict:
         # The pipeline returns a list of dictionaries, e.g., [{'label': 'POSITIVE', 'score': 0.99}]
         result = self.model(text)[0]
+        label = str(result["label"]).upper()
+        
+        # Map labels to a uniform "POSITIVE" / "NEGATIVE" standard 
+        if label in ["1", "LABEL_1", "POSITIVE"]:
+            label = "POSITIVE"
+        elif label in ["0", "LABEL_0", "NEGATIVE"]:
+            label = "NEGATIVE"
+            
         return {
-            "label": result["label"],
+            "label": label,
             "score": result["score"]
         }
 
